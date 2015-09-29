@@ -3,6 +3,7 @@ from mne.datasets import sample
 import numpy as np
 from tempfile import mkdtemp
 from os.path import join as opj
+from shutil import rmtree
 
 def test_preload_memmap():
     tmpdir = mkdtemp(dir='/Users/cjb/tmp')
@@ -44,6 +45,7 @@ def test_preload_memmap():
 
     del raw._data
 
+    rmtree(tmpdir, ignore_errors=True)
 #if __name__ == '__main__':
     # test_memmap()
 #
