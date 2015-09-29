@@ -1,0 +1,43 @@
+Filename: mne_preload_raw.py
+
+Line #    Mem usage    Increment   Line Contents
+================================================
+     7     45.1 MiB      0.0 MiB   def test_preload_memmap():
+     8     45.1 MiB      0.0 MiB       tmpdir = mkdtemp(dir='/Users/cjb/tmp')
+     9     45.1 MiB      0.0 MiB       mmap_fname = opj(tmpdir, 'raw_data.dat')
+    10                             
+    11                                 # fname='ec_rest_before_tsss_mc_rsl.fif'
+    12     45.1 MiB      0.0 MiB       data_path = sample.data_path(download=False)
+    13     45.1 MiB      0.0 MiB       fname = data_path + '/MEG/sample/sample_audvis_raw.fif'
+    14                             
+    15     56.0 MiB     10.9 MiB       raw = Raw(fname, preload=False)
+    16                                 # """This function actually preloads the data"""
+    17                                 # data_buffer = mmap_fname
+    18                                 # raw._data = raw._read_segment(data_buffer=data_buffer)[0]
+    19                                 # assert len(raw._data) == raw.info['nchan']
+    20                                 # raw.preload = True
+    21                                 # raw.close()
+    22    536.9 MiB    480.9 MiB       raw.preload_data(data_buffer=mmap_fname)
+    23    536.9 MiB      0.0 MiB       data_shape = raw._data.shape
+    24                             
+    25    536.9 MiB      0.0 MiB       print('Contents of raw._data after reading from fif:')
+    26    536.9 MiB      0.0 MiB       print(type(raw._data))
+    27    536.9 MiB      0.0 MiB       print(raw._data[100][:5])
+    28                             
+    29     58.4 MiB   -478.5 MiB       del raw._data
+    30     58.4 MiB      0.0 MiB       raw._data = np.memmap(mmap_fname, dtype='float64', mode='c',
+    31     58.4 MiB      0.0 MiB                             shape=data_shape)
+    32                             
+    33     58.4 MiB      0.0 MiB       print('Contents of raw._data after RE-loading:')
+    34     58.4 MiB      0.0 MiB       print(type(raw._data))
+    35     58.4 MiB      0.0 MiB       print(raw._data[100][:5])
+    36                             
+    37    543.3 MiB    484.9 MiB       raw.filter(None,40)
+    38    543.3 MiB      0.0 MiB       print('Contents of raw._data after filtering:')
+    39    543.3 MiB      0.0 MiB       print(type(raw._data))
+    40    543.3 MiB      0.0 MiB       print(raw._data[100][:5])
+    41                             
+    42                                 # PROBLEM: Now the filtered data are IN MEMORY, but as a memmap
+    43                                 # What if I'd like to continue from here using it as an ndarray?
+    44                             
+    45     77.6 MiB   -465.8 MiB       del raw._data
